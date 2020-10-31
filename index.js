@@ -5,8 +5,16 @@
 |(2) #Done: Add new cards with the following properties: name, status, content,category and author.
 |(3) #Done: Edit a card's name, status, content, and category for owner only.
 |(4) #Done: Delete cards that belongs to each owner only.
-*/
 
+//GET localhost:5000 // {}
+//POST localhost:5000/auth  // {username,password}
+//GET localhost:5000/session // {}
+//POST localhost:5000/api/allPost // {}
+//POST localhost:5000/api/myPost // {}
+//POST localhost:5000/api/addPost // {content,cardName,cardstatus,cardContent,cardCategory}
+//PUT localhost:5000/api/editPost/[id] // {content,cardName,cardstatus,cardContent,cardCategory}
+//DELTE localhost:5000/api/deletePost/[id] // {}
+*/
 
 const express = require('express');
 var session = require('express-session')
@@ -28,6 +36,7 @@ var con = mysql.createConnection({
   database: "kukkui" //db
 });
 con.connect();
+
 //*************DEFAULT INDEX WITH SESSION,DB,TABLE CREATE*****//////////////////
 app.get('/', (req, res) => {
   let sess = req.session
@@ -41,32 +50,20 @@ app.get('/', (req, res) => {
     if (err) throw err;
     console.log("Database created");
   })
-      console.log("Connected!");
       var sql = "CREATE TABLE IF NOT EXISTS accounts (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255), address VARCHAR(255))";
       con.query(sql, function (err, result) {
         if (err) throw err;
         console.log("Table ACCOUNTS created( IF NOT EXISTS )");
       });
-
-      console.log("Connected!");
       var sql = "CREATE TABLE IF NOT EXISTS blogposts (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255),content LONGTEXT,cardName VARCHAR(255),cardStatus VARCHAR(255),cardContent LONGTEXT,cardCategory VARCHAR(255))";
       con.query(sql, function (err, result) {
         if (err) throw err;
         console.log("Table BLOGPOSTS created ( IF NOT EXISTS )");
       });
     
-    //(username,content,cardName,cardStatus,cardContent,cardCategory
-  res.send('Hello Sertis.Corp! My name is Punyawee Pos(KUKKUI)\nTo test a backend service here...\n----------------\nSteps...\n1)Start XAMPP as a localhost\n2)GET localhost:5000 // {} \n3)POST localhost:5000/auth  // {username,password} \n4)GET localhost:5000/session // {}\n5)POST localhost:5000/api/allPost // {}\n6)POST localhost:5000/api/myPost // {}\n7)POST localhost:5000/api/addPost // {content,cardName,cardstatus,cardContent,cardCategory}\n8)PUT localhost:5000/api/editPost/[id] // {content,cardName,cardstatus,cardContent,cardCategory}\n9)DELTE localhost:5000/api/deletePost/[id] // {}\n----------------\n API Lists...\n-> GET localhost:5000/ \n-> GET localhost:5000/session\n-> POST localhost:5000/auth\n-> POST localhost:5000/api/myPost\n-> POST localhost:5000/api/allPost \n-> PUT localhost:5000/api/editPost/[id] \n-> DELTE localhost:5000/api/deletePost/[id]');
+  res.status(200).send('Hello Sertis.Corp! My name is Punyawee Pos(KUKKUI)\nTo test a backend service here...\n----------------\nSteps...\n1)Start any DB mysql server(Already provided inside the code)\n2)GET localhost:5000 <= {} \n3)POST localhost:5000/auth  <= {username,password} \n4)GET localhost:5000/session <= {}\n5)POST localhost:5000/api/allPost <= {}\n6)POST localhost:5000/api/myPost <= {}\n7)POST localhost:5000/api/addPost <= {content,cardName,cardstatus,cardContent,cardCategory}\n8)PUT localhost:5000/api/editPost/[id] <= {content,cardName,cardstatus,cardContent,cardCategory}\n9)DELTE localhost:5000/api/deletePost/[id] <= {}\n----------------\n API Lists...\n-> GET localhost:5000/ \n-> GET localhost:5000/session\n-> POST localhost:5000/auth\n-> POST localhost:5000/api/myPost\n-> POST localhost:5000/api/allPost \n-> PUT localhost:5000/api/editPost/[id] \n-> DELTE localhost:5000/api/deletePost/[id]');
 })
 
-//GET localhost:5000 // {}
-//POST localhost:5000/auth  // {username,password}
-//GET localhost:5000/session // {}
-//POST localhost:5000/api/allPost // {}
-//POST localhost:5000/api/myPost // {}
-//POST localhost:5000/api/addPost // {content,cardName,cardstatus,cardContent,cardCategory}
-//PUT localhost:5000/api/editPost/[id] // {content,cardName,cardstatus,cardContent,cardCategory}
-//DELTE localhost:5000/api/deletePost/[id] // {}
 //*************GET SESSION CHECKED****************************//////////////////
 app.get('/session', (req, res) => {
   let sess = req.session
@@ -101,7 +98,7 @@ app.post('/auth', (req, res) => {
             var sql = "INSERT INTO accounts (username, password) VALUES ('"+account+"', '"+genPassword+"')";
             con.query(sql, function (err, result) {
                 if (err) throw err;
-                res.send("New account name: "+account+" // With password: "+genPassword);
+                res.status(200).send("New account name: "+account+" // With password: "+genPassword);
                 })
             }
             else{
@@ -109,12 +106,12 @@ app.post('/auth', (req, res) => {
                 con.query(querystring, function (err, result, fields) {
                   if(result.length === 0){
                     console.log("Wrong Password For Username : " + account);
-                    res.send("Wrong Password For Username : " + account) // Please login with your password that we assigned to you at the first time.")
+                    res.status(401).send("Wrong Password For Username : " + account) // Please login with your password that we assigned to you at the first time.")
                   }
                   else{if (err) throw err;
                     var data = JSON.stringify(result[0].username)
                     console.log("Record Exist, Name: " + data);
-                    res.send("Correct Password For Username : " + account +"\n---------\n Now, to view the list of all blogs...\n #Visit the URL:localhost:3000/allBlogs \n without any body requests required\n---------\nTo view only your blog posts...\n#Visit the URL: localhost:3000/myBlogs\nwith require of body requests(username,password)") // Correct
+                    res.status(200).send("Correct Password For Username : " + account +"\n---------\n Now, to view the list of all blogs...\n #Visit the URL:localhost:3000/allBlogs \n without any body requests required\n---------\nTo view only your blog posts...\n#Visit the URL: localhost:3000/myBlogs\nwith require of body requests(username,password)") // Correct
                  }
               })
             }
@@ -140,7 +137,7 @@ app.post('/api/myPost', (req, res) => {
         con.query("SELECT * FROM accounts WHERE username = '"+ account +"'", function(err, result, field){
           if(result.length === 0){
             //check if username correct or not, if not show error username input
-            res.send("Wrong username input, please try again.")
+            res.status(401).send("Wrong username input, please try again.")
           }
             else{
                 //check if username and password correct for view blogs post or not
@@ -148,7 +145,7 @@ app.post('/api/myPost', (req, res) => {
                 con.query(querystring, function (err, result, fields) {
                   if(result.length === 0){
                     console.log("Wrong Password For Username : " + account);
-                    res.send("Wrong Password For Username : " + account) // Please login with your password that we assigned to you at the first time.")
+                    res.status(401).send("Wrong Password For Username : " + account) // Please login with your password that we assigned to you at the first time.")
                   }
                   else{if (err) throw err;
                     var data = JSON.stringify(result[0].username)
@@ -161,21 +158,20 @@ app.post('/api/myPost', (req, res) => {
                     con.query(querystring, function (err, result, fields) {
                     if(result.length === 0){
                         // console.log("Wrong Password For Username : " + account);
-                        res.send("No Blog Posts For Username : " + account) // Please login with your password that we assigned to you at the first time.")
+                        res.status(204).send("No Blog Posts For Username : " + account) // Please login with your password that we assigned to you at the first time.")
                     }
                     else{if (err) throw err;
-                      console.log("Blog post from "+account+" are shown by res.send")
+                      console.log("Blog post from "+account+" are shown by res.status(200).send")
                         var string=JSON.stringify(result);
                         var json =  JSON.parse(string);
-                        res.send(json);
+                        res.status(200).send(json);
                     }
                   })
                 }
               })
             }
         })
-    //Add new blog card via POST 
-    //Activate on url : http://[localhost]:[port]/addCard 
+    
 });
 
 //*************VIEW PERSONAL BLOGS****************************//////////////////
@@ -203,7 +199,7 @@ app.post('/api/addPost', (req, res) => {
       con.query("SELECT * FROM accounts WHERE username = '"+ account +"'", function(err, result, field){
         if(result.length === 0){
           //check if username correct or not, if not show error username input
-          res.send("Wrong username input, please try again.")
+          res.status(401).send("Wrong username input, please try again.")
         }
           else{
               //check if username and password correct for view blogs post or not
@@ -211,7 +207,7 @@ app.post('/api/addPost', (req, res) => {
               con.query(querystring, function (err, result, fields) {
                 if(result.length === 0){
                   console.log("Wrong Password For Username : " + account);
-                  res.send("Wrong Password For Username : " + account) // Please login with your password that we assigned to you at the first time.")
+                  res.status(401).send("Wrong Password For Username : " + account) // Please login with your password that we assigned to you at the first time.")
                 }
                 else{
                 console.log("Problem Here");
@@ -220,7 +216,7 @@ app.post('/api/addPost', (req, res) => {
                 var sql = "INSERT INTO blogposts (username,content,cardName,cardStatus,cardContent,cardCategory) VALUES ('"+account+"','"+content2+"','"+cardName2+"','"+cardStatus2+"','"+cardContent2+"','"+cardCategory2+"')";
                 con.query(sql, function (err, result) {
                   if (err) throw err;
-                  res.send("Already add new post for account name: "+account+" \nWith Content: "+content+"\nWith cardName: "+cardName+"\nWith cardStatus: "+cardStatus+"\nWith cardContent: "+cardContent+"\nWith cardCategory: "+cardCategory);
+                  res.status(200).send("Already add new post for account name: "+account+" \nWith Content: "+content+"\nWith cardName: "+cardName+"\nWith cardStatus: "+cardStatus+"\nWith cardContent: "+cardContent+"\nWith cardCategory: "+cardCategory);
                 })
               }
             })
@@ -245,7 +241,7 @@ app.post('/api/allPost', (req, res) => {
                   con.query(querystring, function (err, result, fields) {
                   if(result.length === 0){
                       // console.log("Wrong Password For Username : " + account);
-                      res.send("No Blog Posts") // Please login with your password that we assigned to you at the first time.")
+                      res.status(204).send("No Blog Posts") // Please login with your password that we assigned to you at the first time.")
                   }
                   else{if (err) throw err;
                       var string=JSON.stringify(result);
@@ -256,8 +252,6 @@ app.post('/api/allPost', (req, res) => {
                       res.status(200).send(json);
                   }
   })
-  //Add new blog card via POST 
-  //Activate on url : http://[localhost]:[port]/addCard 
 });
 
 //*************EDIT BLOG POST*********************************//////////////////
@@ -282,7 +276,7 @@ app.put('/api/editPost/:id', (req, res) => {
     con.query("SELECT * FROM accounts WHERE username = '"+ account +"'", function(err, result, field){
       if(result.length === 0){
         //check if username correct or not, if not show error username input
-        res.send("Wrong username input, please try again.")
+        res.status(401).send("Wrong username input, please try again.")
       }
         else{
             //check if username and password correct for view blogs post or not
@@ -290,13 +284,13 @@ app.put('/api/editPost/:id', (req, res) => {
             con.query(querystring, function (err, result, fields) {
               if(result.length === 0){
                 console.log("Wrong Password For Username : " + account);
-                res.send("Wrong Password For Username : " + account) // Please login with your password that we assigned to you at the first time.")
+                res.status(401).send("Wrong Password For Username : " + account) // Please login with your password that we assigned to you at the first time.")
               }
               else{
               var sql = "UPDATE blogposts SET content = '"+content2+"',cardName = '"+cardName2+"',cardStatus = '"+cardStatus2+"',cardContent = '"+cardContent2+"',cardCategory = '"+cardCategory2+"' WHERE id = '"+id+"' AND username = '"+account+"'";
               con.query(sql, function (err, result) {
                 if (err) throw err;
-                res.send("Edit Process Completed \n!!Note : If you still see the record even you've edited its\nPlease remind that you have edit the post that's not belong to you!");
+                res.status(204).send("Edit Process Completed \n!!Note : If you still see the record even you've edited its\nPlease remind that you have edit the post that's not belong to you!");
               })
             }
           })
@@ -315,21 +309,21 @@ app.delete('/api/deletePost/:id', (req, res) => {
     con.query("SELECT * FROM accounts WHERE username = '"+ account +"'", function(err, result, field){
       if(result.length === 0){
         //check if username correct or not, if not show error username input
-        res.send("UnAuthorized!! \nplease try again via POST at localhost:[Port]/checkAccount.")
+        res.status(401).send("UnAuthorized!! \nplease try again via POST at localhost:[Port]/auth.")
       }
         else{
-            //check if username and password correct for view blogs post or not
+            //check if username and password correct for delete blogs post or not
             const querystring="SELECT * FROM accounts WHERE username ='"+account+"' AND password='"+password+"'";
             con.query(querystring, function (err, result, fields) {
               if(result.length === 0){
                 console.log("Wrong Password For Username : " + account);
-                res.send("Wrong Password For Username : " + account) // Please login with your password that we assigned to you at the first time.")
+                res.status(401).send("Wrong Password For Username : " + account) // Please login with your password that we assigned to you at the first time.")
               }
               else{
               var sql = "DELETE FROM blogposts WHERE id = '"+id+"' AND username = '"+account+"'";
               con.query(sql, function (err, result) {
                 if (err) throw err;
-                res.send("Delete Process Completed \n!!Note : If you still see the record even you've deleted its\nPlease remind that you have delete the post that's not belong to you!");
+                res.status(204).send("Delete Process Completed \n!!Note : If you still see the record even you've deleted its\nPlease remind that you have delete the post that's not belong to you!");
               })
             }
           })
