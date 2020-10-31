@@ -1,4 +1,9 @@
 <b>Sertis Backend Lab</b>
+<br/>
+TODOS...
+<br/>
+1. npm i <br/>
+2. npm start <br/>
 <p6>API lists...</p6><br/>
 <p6>
 GET localhost:5000 // {}<br/>
