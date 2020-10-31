@@ -7,13 +7,13 @@
 | URL | METHOD | REQ-BODY | EVENTS |
 | ------ | --- | ------ | ------------ |
 | localhost:5000 | GET | - | Create table/database and set sessions|
-| localhost:5000/auth | POST | username,password | check for account authentication, old account check password, new account randomly generated password | 
+| localhost:5000/auth | POST | username<br/>password | check for account authentication, old account check password, new account randomly generated password | 
 | localhost:5000/session  | GET | - | check all sessions for current value|
 | localhost:5000/api/allPost  | POST | - | list all post from anyone with JSON output. Fetch from mysql online instead of local mysql| 
 | localhost:5000/api/myPost | POST | - | list all posts that own by current authenticated user |
-| localhost:5000/api/addPost | POST | content,cardName,cardstatus,cardContent,cardCategory | Add new post(with title/status/category/name/etc) and record the owner rights | 
-| localhost:5000/api/editPost/:id | PUT | content,cardName,cardstatus,cardContent,cardCategory | Update the post that own by the current authenticted user |
-| localhost:5000/api/deletePost/:id | DELETE | - | Delete content own by the authenticated user | 
+| localhost:5000/api/addPost | POST | content<br/>cardName<br/>cardstatus<br/>cardContent<br/>cardCategory | Add new post(with title/status/category/name/etc) and record the owner rights | 
+| localhost:5000/api/editPost/[:id] | PUT | content<br/>cardName<br/>cardstatus<br/>cardContent<br/>cardCategory | Update the post that own by the current authenticted user |
+| localhost:5000/api/deletePost/[:id] | DELETE | - | Delete content own by the authenticated user | 
 <hr/>
 <p6>API lists...</p6><br/>
 - <p6>
