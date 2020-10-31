@@ -15,8 +15,8 @@
 | localhost:5000/api/editPost/[:id] | PUT | content<br/>cardName<br/>cardstatus<br/>cardContent<br/>cardCategory | Update the post that own by the current authenticted user |
 | localhost:5000/api/deletePost/[:id] | DELETE | - | Delete content own by the authenticated user | 
 <hr/>
-<p6>API lists...</p6><br/>
-- <p6>
+<p6>**API lists...**</p6><br/>
+<p6>
 - GET localhost:5000 <= {}<br/>
 - POST localhost:5000/auth  <= {username,password}<br/>
 - GET localhost:5000/session <= {}<br/>
