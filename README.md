@@ -8,7 +8,7 @@ POST localhost:5000/api/allPost // {}<br/>
 POST localhost:5000/api/myPost // {}<br/>
 POST localhost:5000/api/addPost // {content,cardName,cardstatus,cardContent,cardCategory}<br/>
 PUT localhost:5000/api/editPost/[id] // {content,cardName,cardstatus,cardContent,cardCategory}<br/>
-DELTE localhost:5000/api/deletePost/[id] // {}<br/>
+DELETE localhost:5000/api/deletePost/[id] // {}<br/>
 </p6>
 <hr/><br/>
 
