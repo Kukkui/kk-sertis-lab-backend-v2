@@ -1,4 +1,3 @@
-
 <b>SERTIS BACKEND LAB</b>
 <br/><br/>
 **TODOS...**
@@ -6,7 +5,7 @@
 2. npm start <br/>
 
 | URL | METHOD | REQ-BODY | EVENTS |
-| ------ | ------ | ------ | ------ |
+| ------ | --- | ------ | ------------ |
 | localhost:5000 | GET | - | Create table/database and set sessions|
 | localhost:5000/auth | POST | username,password | check for account authentication, old account check password, new account randomly generated password | 
 | localhost:5000/session  | GET | - | check all sessions for current value|
@@ -25,12 +24,11 @@
 - POST localhost:5000/api/myPost <= {}<br/>
 - POST localhost:5000/api/addPost <= {content,cardName,cardstatus,cardContent,cardCategory}<br/>
 - PUT localhost:5000/api/editPost/[id] <= {content,cardName,cardstatus,cardContent,cardCategory}<br/>
-- DELETE localhost:5000/api/deletePost/[id] <= {}<br/>
-- </p6>
+- DELETE localhost:5000/api/deletePost/[id] <= {}<br/></p6>
 
 <hr/><br/>
 
-<br/><hr/><br/>
+<br/>
 <img src="./screenshots/index.gif" width="100%" /><br/>
 <b>GET localhost:5000 <= {} </b><br/><br/>
 <hr/><br/>
