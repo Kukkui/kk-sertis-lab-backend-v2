@@ -19,6 +19,7 @@
 const express = require('express');
 var session = require('express-session')
 const mysql = require('mysql')
+const db = require('./db/dbconnect')
 var generator = require('generate-password');
 var tempResult;
 const app = express();
@@ -29,13 +30,6 @@ app.use(session({
   resave: false,
   saveUninitialized: true
 }))
-var con = mysql.createConnection({
-  host: "db4free.net", //or localhost
-  user: "kukkui", //mysql username
-  password: "Kukkui2537", //mysql password
-  database: "kukkui" //db
-});
-con.connect();
 
 //*************DEFAULT INDEX WITH SESSION,DB,TABLE CREATE*****//////////////////
 app.get('/', (req, res) => {
@@ -46,17 +40,17 @@ app.get('/', (req, res) => {
   
   
   console.log("Connected!");
-  con.query("CREATE DATABASE IF NOT EXISTS kukkui", function (err, result) {
+  db.con.query("CREATE DATABASE IF NOT EXISTS kukkui", function (err, result) {
     if (err) throw err;
     console.log("Database created");
   })
       var sql = "CREATE TABLE IF NOT EXISTS accounts (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255), address VARCHAR(255))";
-      con.query(sql, function (err, result) {
+      db.con.query(sql, function (err, result) {
         if (err) throw err;
         console.log("Table ACCOUNTS created( IF NOT EXISTS )");
       });
       var sql = "CREATE TABLE IF NOT EXISTS blogposts (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255),content LONGTEXT,cardName VARCHAR(255),cardStatus VARCHAR(255),cardContent LONGTEXT,cardCategory VARCHAR(255))";
-      con.query(sql, function (err, result) {
+      db.con.query(sql, function (err, result) {
         if (err) throw err;
         console.log("Table BLOGPOSTS created ( IF NOT EXISTS )");
       });
@@ -89,21 +83,21 @@ app.post('/auth', (req, res) => {
     sess.username = account
     sess.password = password
     
-        con.query("SELECT * FROM accounts WHERE username = '"+ account +"'", function(err, result, field){
+        db.con.query("SELECT * FROM accounts WHERE username = '"+ account +"'", function(err, result, field){
           if(result.length === 0){
             var genPassword = generator.generate({
               length: 10,
               numbers: true
             });
             var sql = "INSERT INTO accounts (username, password) VALUES ('"+account+"', '"+genPassword+"')";
-            con.query(sql, function (err, result) {
+            db.con.query(sql, function (err, result) {
                 if (err) throw err;
                 res.status(200).send("New account name: "+account+" // With password: "+genPassword);
                 })
             }
             else{
                 const querystring="SELECT * FROM accounts WHERE username ='"+account+"' AND password='"+password+"'";
-                con.query(querystring, function (err, result, fields) {
+                db.con.query(querystring, function (err, result, fields) {
                   if(result.length === 0){
                     console.log("Wrong Password For Username : " + account);
                     res.status(401).send("Wrong Password For Username : " + account) // Please login with your password that we assigned to you at the first time.")
@@ -134,7 +128,7 @@ app.post('/api/myPost', (req, res) => {
     let sess = req.session
     var account = sess.username
     var password = sess.password 
-        con.query("SELECT * FROM accounts WHERE username = '"+ account +"'", function(err, result, field){
+        db.con.query("SELECT * FROM accounts WHERE username = '"+ account +"'", function(err, result, field){
           if(result.length === 0){
             //check if username correct or not, if not show error username input
             res.status(401).send("Wrong username input, please try again.")
@@ -142,7 +136,7 @@ app.post('/api/myPost', (req, res) => {
             else{
                 //check if username and password correct for view blogs post or not
                 const querystring="SELECT * FROM accounts WHERE username ='"+account+"' AND password='"+password+"'";
-                con.query(querystring, function (err, result, fields) {
+                db.con.query(querystring, function (err, result, fields) {
                   if(result.length === 0){
                     console.log("Wrong Password For Username : " + account);
                     res.status(401).send("Wrong Password For Username : " + account) // Please login with your password that we assigned to you at the first time.")
@@ -155,7 +149,7 @@ app.post('/api/myPost', (req, res) => {
                     //Now fetch DB for blog posts for each account
                     //
                     const querystring="SELECT * FROM blogposts WHERE username ='"+account+"'";
-                    con.query(querystring, function (err, result, fields) {
+                    db.con.query(querystring, function (err, result, fields) {
                     if(result.length === 0){
                         // console.log("Wrong Password For Username : " + account);
                         res.status(204).send("No Blog Posts For Username : " + account) // Please login with your password that we assigned to you at the first time.")
@@ -196,7 +190,7 @@ app.post('/api/addPost', (req, res) => {
   let sess = req.session
   var account = sess.username
   var password = sess.password 
-      con.query("SELECT * FROM accounts WHERE username = '"+ account +"'", function(err, result, field){
+      db.con.query("SELECT * FROM accounts WHERE username = '"+ account +"'", function(err, result, field){
         if(result.length === 0){
           //check if username correct or not, if not show error username input
           res.status(401).send("Wrong username input, please try again.")
@@ -204,7 +198,7 @@ app.post('/api/addPost', (req, res) => {
           else{
               //check if username and password correct for view blogs post or not
               const querystring="SELECT * FROM accounts WHERE username ='"+account+"' AND password='"+password+"'";
-              con.query(querystring, function (err, result, fields) {
+              db.con.query(querystring, function (err, result, fields) {
                 if(result.length === 0){
                   console.log("Wrong Password For Username : " + account);
                   res.status(401).send("Wrong Password For Username : " + account) // Please login with your password that we assigned to you at the first time.")
@@ -214,7 +208,7 @@ app.post('/api/addPost', (req, res) => {
                 console.log("Already add new post for account name: "+account+" \nWith Content: "+content+"\nWith cardName: "+cardName+"\nWith cardStatus: "+cardStatus+"\nWith cardContent: "+cardContent+"\nWith cardCategory: "+cardCategory);
                 //problem here
                 var sql = "INSERT INTO blogposts (username,content,cardName,cardStatus,cardContent,cardCategory) VALUES ('"+account+"','"+content2+"','"+cardName2+"','"+cardStatus2+"','"+cardContent2+"','"+cardCategory2+"')";
-                con.query(sql, function (err, result) {
+                db.con.query(sql, function (err, result) {
                   if (err) throw err;
                   res.status(200).send("Already add new post for account name: "+account+" \nWith Content: "+content+"\nWith cardName: "+cardName+"\nWith cardStatus: "+cardStatus+"\nWith cardContent: "+cardContent+"\nWith cardCategory: "+cardCategory);
                 })
@@ -238,7 +232,7 @@ app.post('/api/allPost', (req, res) => {
   var password = req.body.password;
   
     const querystring="SELECT * FROM blogposts";
-                  con.query(querystring, function (err, result, fields) {
+                  db.con.query(querystring, function (err, result, fields) {
                   if(result.length === 0){
                       // console.log("Wrong Password For Username : " + account);
                       res.status(204).send("No Blog Posts") // Please login with your password that we assigned to you at the first time.")
@@ -273,7 +267,7 @@ app.put('/api/editPost/:id', (req, res) => {
   var account = sess.username
   var password = sess.password 
 
-    con.query("SELECT * FROM accounts WHERE username = '"+ account +"'", function(err, result, field){
+    db.con.query("SELECT * FROM accounts WHERE username = '"+ account +"'", function(err, result, field){
       if(result.length === 0){
         //check if username correct or not, if not show error username input
         res.status(401).send("Wrong username input, please try again.")
@@ -281,14 +275,14 @@ app.put('/api/editPost/:id', (req, res) => {
         else{
             //check if username and password correct for view blogs post or not
             const querystring="SELECT * FROM accounts WHERE username ='"+account+"' AND password='"+password+"'";
-            con.query(querystring, function (err, result, fields) {
+            db.con.query(querystring, function (err, result, fields) {
               if(result.length === 0){
                 console.log("Wrong Password For Username : " + account);
                 res.status(401).send("Wrong Password For Username : " + account) // Please login with your password that we assigned to you at the first time.")
               }
               else{
               var sql = "UPDATE blogposts SET content = '"+content2+"',cardName = '"+cardName2+"',cardStatus = '"+cardStatus2+"',cardContent = '"+cardContent2+"',cardCategory = '"+cardCategory2+"' WHERE id = '"+id+"' AND username = '"+account+"'";
-              con.query(sql, function (err, result) {
+              db.con.query(sql, function (err, result) {
                 if (err) throw err;
                 res.status(204).send("Edit Process Completed \n!!Note : If you still see the record even you've edited its\nPlease remind that you have edit the post that's not belong to you!");
               })
@@ -306,7 +300,7 @@ app.delete('/api/deletePost/:id', (req, res) => {
   var account = sess.username
   var password = sess.password 
 
-    con.query("SELECT * FROM accounts WHERE username = '"+ account +"'", function(err, result, field){
+    db.con.query("SELECT * FROM accounts WHERE username = '"+ account +"'", function(err, result, field){
       if(result.length === 0){
         //check if username correct or not, if not show error username input
         res.status(401).send("UnAuthorized!! \nplease try again via POST at localhost:[Port]/auth.")
@@ -314,14 +308,14 @@ app.delete('/api/deletePost/:id', (req, res) => {
         else{
             //check if username and password correct for delete blogs post or not
             const querystring="SELECT * FROM accounts WHERE username ='"+account+"' AND password='"+password+"'";
-            con.query(querystring, function (err, result, fields) {
+            db.con.query(querystring, function (err, result, fields) {
               if(result.length === 0){
                 console.log("Wrong Password For Username : " + account);
                 res.status(401).send("Wrong Password For Username : " + account) // Please login with your password that we assigned to you at the first time.")
               }
               else{
               var sql = "DELETE FROM blogposts WHERE id = '"+id+"' AND username = '"+account+"'";
-              con.query(sql, function (err, result) {
+              db.con.query(sql, function (err, result) {
                 if (err) throw err;
                 res.status(204).send("Delete Process Completed \n!!Note : If you still see the record even you've deleted its\nPlease remind that you have delete the post that's not belong to you!");
               })
