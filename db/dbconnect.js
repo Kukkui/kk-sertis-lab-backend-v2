@@ -1,14 +1,16 @@
-var mysql = require('mysql');
-var con = mysql.createConnection({
-    host: "db4free.net", //or localhost
-    user: "kukkui", //mysql username
-    password: "Kukkui2537", //mysql password
-    database: "kukkui" //db
-  });
-con.connect(function(err) {
-    if (err) throw err;
+/* eslint-disable prefer-const */
+/* eslint-disable no-unused-vars */
+const mysql = require('mysql');
+const mongo = require('mongodb');
+const MongoClient = require('mongodb').MongoClient;
+const url = 'mongodb://localhost:27017/kukkui';
+const con = MongoClient.connect(url, function(err, db) {
+  if (err) throw err;
+  console.log('Database created!');
+  const dbo = db.db('kukkui');
 });
 
+
 module.exports = {
-    con: con
-}
+  con: con,
+};
