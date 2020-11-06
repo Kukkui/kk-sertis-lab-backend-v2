@@ -1,0 +1,9 @@
+{
+    "editor.fontSize": 16,
+    "eslint.alwaysShowStatus": true,
+    "eslint.format.enable": true,
+    "eslint.lintTask.enable": true,
+    "less.lint.duplicateProperties": "warning",
+    "less.lint.compatibleVendorPrefixes": "warning",
+    "npm.enableRunFromFolder": true
+}
