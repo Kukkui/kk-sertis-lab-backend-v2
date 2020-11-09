@@ -1,5 +1,6 @@
 /* eslint-disable prefer-const */
 /* eslint-disable no-unused-vars */
+'use strict';
 const mysql = require('mysql');
 const mongo = require('mongodb');
 const MongoClient = require('mongodb').MongoClient;
@@ -9,8 +10,6 @@ const con = MongoClient.connect(url, function(err, db) {
   console.log('Database created!');
   const dbo = db.db('kukkui');
 });
-
-
 module.exports = {
   con: con,
 };

@@ -2,7 +2,7 @@
 /* eslint-disable max-len */
 /* eslint-disable new-cap */
 /* eslint-disable no-var */
-
+'use strict';
 const express = require('express');
 const routes = require('express').Router();
 const session = require('express-session');
@@ -10,6 +10,7 @@ const db = require('./../db/dbconnect');
 const generator = require('generate-password');
 const authController = require('./../controllers/authController');
 const userController = require('./../controllers/userController');
+const {RuleTester} = require('eslint');
 
 routes.use(express.json());
 routes.use(session({

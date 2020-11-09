@@ -1,11 +1,13 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable max-len */
 /* eslint-disable no-invalid-this */
+'use strict';
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 
 const blogposts = new mongoose.Schema({
+  username: String,
   content: String,
   cardName: String,
   cardStatus: String,
