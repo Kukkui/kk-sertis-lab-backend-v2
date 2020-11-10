@@ -4,6 +4,7 @@ const routes = require('./routes');
 const bodyParser = require('body-parser');
 const dbConfig = require('./configs/development.config.js');
 const mongoose = require('mongoose');
+
 // eslint-disable-next-line no-unused-vars
 const app = express();
 app.use(express.json());
@@ -11,10 +12,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
 // Configuring the database
-
-
 mongoose.Promise = global.Promise;
-
 mongoose.connect(dbConfig.url, {
   useNewUrlParser: true,
 }).then(() => {
@@ -25,12 +23,7 @@ mongoose.connect(dbConfig.url, {
 });
 
 // define a simple route
-
-
 app.use('/', routes);
-
 const port = process.env.PORT || 5000;
 app.listen(port, () => console.log(`Listening on port : ${port}...`) );
-
-
 module.exports = app;

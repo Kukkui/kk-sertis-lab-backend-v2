@@ -1,37 +1,32 @@
-/* eslint-disable keyword-spacing */
-/* eslint-disable key-spacing */
-/* eslint-disable new-cap */
-/* eslint-disable prefer-const */
-/* eslint-disable object-curly-spacing */
-/* eslint-disable no-unused-vars */
-/* eslint-disable no-var */
-/* eslint-disable eol-last */
-/* eslint-disable max-len */
 'use strict';
 const auth = require('../models/auth.model');
 const accounts = require('../models/user.model');
-const MongoClient = require('mongodb').MongoClient;
-const mongodb = require('mongodb');
-const url = 'mongodb://localhost:27017/kukkui';
+// view my posts via mongoose model
 exports.myposts = async (req, res, next) => {
   try {
     const sess = req.session;
     const username = sess.username;
     const password = sess.password;
+    // check for authenticated
     auth.findOne({username: username}, function(err, user) {
       if (err) throw err;
       if (user) {
+        // compare password from session username and password
         user.comparePassword(password, function(err, isMatch) {
           if (err) throw err;
+          // username and password was found(authenticted isMatch)
           if (isMatch) {
-            accounts.find({username:username}, function(err, posts) {
+            //
+            accounts.find({username: username}, function(err, posts) {
               if (err) return next(err);
               console.log(posts);
               res.send(posts);
             });
           } else {
             console.log('Password incorrect : '+password, isMatch);
-            res.status(401).json({'message': `Wrong Password For Username : ${username}`});
+            res.status(401).json({
+              'message': `Wrong Password For Username : ${username}`,
+            });
           }
         });
       } else {
@@ -45,6 +40,7 @@ exports.myposts = async (req, res, next) => {
     throw err;
   };
 };
+// add posts via mongoose model
 exports.addposts = async (req, res, next) => {
   try {
     const sess = req.session;
@@ -56,22 +52,24 @@ exports.addposts = async (req, res, next) => {
         user.comparePassword(password, function(err, isMatch) {
           if (err) throw err;
           if (isMatch) {
-            let postobj = {
-              'username' : req.body.username,
-              'content' : req.body.content,
-              'cardName' : req.body.cardName,
-              'cardStatus' : req.body.cardStatus,
+            const postobj = {
+              'username': req.body.username,
+              'content': req.body.content,
+              'cardName': req.body.cardName,
+              'cardStatus': req.body.cardStatus,
               'cardContent': req.body.cardContent,
               'cardCategory': req.body.cardCategory,
             };
             accounts.create(postobj, function(err, result) {
-              if(err) return next(err);
+              if (err) return next(err);
               console.log(result);
               res.send(result);
             });
           } else {
             console.log('Password incorrect : '+password, isMatch);
-            res.status(401).json({'message': `Wrong Password For Username : ${username}`});
+            res.status(401).json({
+              'message': `Wrong Password For Username : ${username}`,
+            });
           }
         });
       } else {
@@ -85,12 +83,10 @@ exports.addposts = async (req, res, next) => {
     throw err;
   };
 };
-
-
 exports.allposts = async (req, res, next) => {
   try {
     accounts.find({}, function(err, result) {
-      if(err) return next(err);
+      if (err) return next(err);
       console.log(result);
       res.send(result);
     });
@@ -98,7 +94,6 @@ exports.allposts = async (req, res, next) => {
     throw err;
   }
 };
-
 exports.editposts = async (req, res, next) => {
   try {
     const sess = req.session;
@@ -110,16 +105,19 @@ exports.editposts = async (req, res, next) => {
         user.comparePassword(password, function(err, isMatch) {
           if (err) throw err;
           if (isMatch) {
-            let postobj = {
-              'username' : req.body.username,
-              'content' : req.body.content,
-              'cardName' : req.body.cardName,
-              'cardStatus' : req.body.cardStatus,
+            const postobj = {
+              'username': req.body.username,
+              'content': req.body.content,
+              'cardName': req.body.cardName,
+              'cardStatus': req.body.cardStatus,
               'cardContent': req.body.cardContent,
               'cardCategory': req.body.cardCategory,
             };
-            accounts.findOneAndUpdate({ _id: req.params.id, username: username}, postobj, function(err, user) {
-              if(err) console.log(err);
+            accounts.findOneAndUpdate({
+              _id: req.params.id,
+              username: username,
+            }, postobj, function(err, user) {
+              if (err) console.log(err);
               console.log('Successful edit');
               res.status(200).json({
                 'message': `Complete edit post id : ${req.params.id}`,
@@ -127,7 +125,9 @@ exports.editposts = async (req, res, next) => {
             });
           } else {
             console.log('Password incorrect : '+password, isMatch);
-            res.status(401).json({'message': `Wrong Password For Username : ${username}`});
+            res.status(401).json({
+              'message': `Wrong Password For Username : ${username}`,
+            });
           }
         });
       } else {
@@ -141,6 +141,7 @@ exports.editposts = async (req, res, next) => {
     throw err;
   };
 };
+// delete post via mongoose model
 exports.deleteposts = async (req, res) => {
   // eslint-disable-next-line no-unused-vars
   try {
@@ -153,15 +154,20 @@ exports.deleteposts = async (req, res) => {
         user.comparePassword(password, function(err, isMatch) {
           if (err) throw err;
           if (isMatch) {
-            accounts.deleteOne({ _id: req.params.id, username: username}, function(err, user) {
-              if(err) console.log(err);
+            accounts.deleteOne({
+              _id: req.params.id,
+              username: username,
+            }, function(err, user) {
+              if (err) console.log(err);
               console.log('Successful deletion');
               res.status(200).json({
                 'message': `Complete delete post id : ${req.params.id}`,
               });
             });
           } else {
-            res.status(401).json({'message': `Wrong Password For Username : ${username}`});
+            res.status(401).json({
+              'message': `Wrong Password For Username : ${username}`,
+            });
           }
         });
       } else {
