@@ -83,6 +83,7 @@ exports.addposts = async (req, res, next) => {
     throw err;
   };
 };
+// list all posts via mongoose model
 exports.allposts = async (req, res, next) => {
   try {
     accounts.find({}, function(err, result) {
@@ -94,6 +95,7 @@ exports.allposts = async (req, res, next) => {
     throw err;
   }
 };
+// edit posts via mongoose model req.params.id
 exports.editposts = async (req, res, next) => {
   try {
     const sess = req.session;
@@ -141,7 +143,7 @@ exports.editposts = async (req, res, next) => {
     throw err;
   };
 };
-// delete post via mongoose model
+// delete post via mongoose model req.params.id
 exports.deleteposts = async (req, res) => {
   // eslint-disable-next-line no-unused-vars
   try {
