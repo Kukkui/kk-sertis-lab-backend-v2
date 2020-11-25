@@ -1,18 +1,17 @@
+
 /* eslint-disable no-unused-vars */
 
 /* eslint-disable max-len */
 /* eslint-disable new-cap */
 /* eslint-disable no-var */
 'use strict';
-var mocha = require('mocha');
+const mocha = require('mocha');
 const describe = mocha.describe;
 
-var it = mocha.it;
-var assert = require('chai').assert;
+const it = mocha.it;
 const express = require('express');
-var app=express();
-var request = require('supertest');
-const routes = require('express').Router();
+const app=express();
+const request = require('supertest');
 const session = require('express-session');
 const authController = require('./../controllers/authController');
 const userController = require('./../controllers/userController');
@@ -48,17 +47,3 @@ describe('/GET index home', function() {
         });
   });
 });
-// describe('POST /login', function() {
-//   it('responds with json', function(done) {
-//     request(app)
-//         .post('/auth')
-//         .send({'username': 'kukkui', 'password': 'kukkui'}
-//             .expect(200)
-//             .end(function(err, res) {
-//               if (err) return done(err);
-//               done();
-//             }),
-//         );
-//   });
-// });
-

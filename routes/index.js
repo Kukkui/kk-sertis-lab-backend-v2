@@ -18,7 +18,7 @@ routes.use(session({
   saveUninitialized: true,
 }));
 routes.get('/', (req, res) => {
-  res.json({'message': 'Kukkui Sertis Lab'});
+  res.json({'message': 'Kukkui Sertis Lab v7 with pm2 and git push'});
 });
 routes.post('/auth', authController.auth);
 routes.get('/posts/me', userController.myposts);
