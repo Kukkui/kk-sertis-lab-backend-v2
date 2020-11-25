@@ -29,7 +29,7 @@ deploy:
     - ssh pposr@34.121.217.0 'rm -rf ~/kk/kukkui-sertis-lab-backend'
     - ssh pposr@34.121.217.0 'mkdir ~/kk/kukkui-sertis-lab-backend'
       #extract with exclude
-    - ssh pposr@34.121.217.0 'tar -xf ~/kk/kukkui-sertis-lab-backend.tar.gz -C ~/kk/kukkui-sertis-lab-backend/ --exclude=screenshots'
+    - ssh pposr@34.121.217.0 'tar -xf ~/kk/kukkui-sertis-lab-backend.tar.gz -C ~/kk/kukkui-sertis-lab-backend/ --exclude=screenshots --exclude=node_modules'
     - ssh pposr@34.121.217.0 '/usr/local/bin/pm2 delete index'
     - ssh pposr@34.121.217.0 '/usr/local/bin/pm2 start ~/kk/kukkui-sertis-lab-backend/index.js'
 
