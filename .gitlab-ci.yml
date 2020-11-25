@@ -22,12 +22,12 @@ deploy:
     - ssh-add <(echo "$SSH_PRIVATE_KEY_PPOSR")
     - mkdir -p ~/.ssh
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
-    - tar zcf ../$CI_PROJECT_NAME.tar.gz --exclude=./.git --exclude=./node_modules ./
+    - tar zcf ../$CI_PROJECT_NAME.tar.gz ./
     - scp -o StrictHostKeyChecking=no ../$CI_PROJECT_NAME.tar.gz pposr@34.121.217.0:~/kk
       #remove and create new folder name kukkui-sertis-lab-backend
     - ssh pposr@34.121.217.0 'rm -rf ~/kk/kukkui-sertis-lab-backend'
-    #- ssh pposr@34.121.217.0 'mkdir ~/kk/kukkui-sertis-lab-backend'
-    - ssh pposr@34.121.217.0 'tar -xf ~/kk/kukkui-sertis-lab-backend.tar.gz'
-    #- ssh pposr@34.121.217.0 '/usr/local/bin/pm2 delete index'
+    - ssh pposr@34.121.217.0 'mkdir ~/kk/kukkui-sertis-lab-backend'
+    - ssh pposr@34.121.217.0 'tar -xf ~/kk/kukkui-sertis-lab-backend.tar.gz -C ~/kk/kukkui-sertis-lab-backend/'
+    - ssh pposr@34.121.217.0 '/usr/local/bin/pm2 delete index'
     - ssh pposr@34.121.217.0 '/usr/local/bin/pm2 start ~/kk/kukkui-sertis-lab-backend/index.js'
 
