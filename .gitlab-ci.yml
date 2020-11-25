@@ -1,0 +1,28 @@
+image: node:12
+
+before_script:
+    - npm i --save
+    
+stages:
+    - test
+    - deploy
+
+tests:
+  stage: test
+  script: npm test
+
+deploy:
+  stage: deploy
+  script:
+      # Install ssh-agent if not already installed, it is required by Docker.
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+      # Run ssh-agent (inside the build environment)
+    - eval $(ssh-agent -s)
+      # Add the SSH key stored in SSH_PRIVATE_KEY variable to the agent store
+    - ssh-add <(echo "$SSH_PRIVATE_KEY")
+    - mkdir -p ~/.ssh
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+    - tar zcf ../$CI_PROJECT_NAME.tar.gz ./
+    - scp -o StrictHostKeyChecking=no ../$CI_PROJECT_NAME.tar.gz se02@34.121.217.0
+    # - ssh kukkui@35.236.131.20 "rm -rf ./$CI_PROJECT_NAME && mkdir -p ./$CI_PROJECT_NAME && tar zxf ./$CI_PROJECT_NAME.tar.gz -C ./$CI_PROJECT_NAME && chmod -R 655 ./$CI_PROJECT_NAME && cd ./$CI_PROJECT_NAME && npm rebuild && /etc/init.d/$CI_PROJECT_NAME restart"
+
