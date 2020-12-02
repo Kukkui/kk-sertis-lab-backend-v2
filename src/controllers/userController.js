@@ -4,9 +4,13 @@ const accounts = require('../models/user.model');
 // view my posts via mongoose model
 exports.myposts = async (req, res, next) => {
   try {
+    let username = req.body.username;
+    let password = req.body.password;
     const sess = req.session;
-    const username = sess.username;
-    const password = sess.password;
+    if (req.session) {
+      username = sess.username;
+      password = sess.password;
+    };
     // check for authenticated
     auth.findOne({username: username}, function(err, user) {
       if (err) throw err;
@@ -24,16 +28,16 @@ exports.myposts = async (req, res, next) => {
             });
           } else {
             console.log('Password incorrect : '+password, isMatch);
-            res.status(401).json({
+            res.status(401).send(JSON.stringify({
               'message': `Wrong Password For Username : ${username}`,
-            });
+            }));
           }
         });
       } else {
-        res.status(200).json({
+        res.status(200).send(JSON.stringify({
           'message': `Can't authorization : ${username}`,
           'hint': 'please try to login and authorized again',
-        });
+        }));
       }
     });
   } catch (err) {
@@ -43,9 +47,13 @@ exports.myposts = async (req, res, next) => {
 // add posts via mongoose model
 exports.addposts = async (req, res, next) => {
   try {
+    let username = req.body.username;
+    let password = req.body.password;
     const sess = req.session;
-    const username = sess.username;
-    const password = sess.password;
+    if (req.session) {
+      username = sess.username;
+      password = sess.password;
+    };
     auth.findOne({username: username}, function(err, user) {
       if (err) throw err;
       if (user) {
@@ -67,16 +75,16 @@ exports.addposts = async (req, res, next) => {
             });
           } else {
             console.log('Password incorrect : '+password, isMatch);
-            res.status(401).json({
+            res.status(401).send(JSON.stringify({
               'message': `Wrong Password For Username : ${username}`,
-            });
+            }));
           }
         });
       } else {
-        res.status(200).json({
+        res.status(200).send(JSON.stringify({
           'message': `Can't authorization : ${username}`,
           'hint': 'please try to login and authorized again',
-        });
+        }));
       }
     });
   } catch (err) {
@@ -98,16 +106,20 @@ exports.allposts = async (req, res, next) => {
 // edit posts via mongoose model req.params.id
 exports.editposts = async (req, res, next) => {
   try {
+    let username = req.body.username;
+    let password = req.body.password;
     const sess = req.session;
-    const username = sess.username;
-    const password = sess.password;
+    if (req.session) {
+      username = sess.username;
+      password = sess.password;
+    };
     auth.findOne({username: username}, function(err, user) {
       if (err) throw err;
       if (user) {
         user.comparePassword(password, function(err, isMatch) {
           if (err) throw err;
           if (isMatch) {
-            const postobj = {
+            const obj = {
               'username': req.body.username,
               'content': req.body.content,
               'cardName': req.body.cardName,
@@ -118,25 +130,26 @@ exports.editposts = async (req, res, next) => {
             accounts.findOneAndUpdate({
               _id: req.params.id,
               username: username,
-            }, postobj, function(err, user) {
+            }, obj, function(err, user) {
               if (err) console.log(err);
               console.log('Successful edit');
-              res.status(200).json({
+
+              res.status(200).send(JSON.stringify({
                 'message': `Complete edit post id : ${req.params.id}`,
-              });
+              }));
             });
           } else {
             console.log('Password incorrect : '+password, isMatch);
-            res.status(401).json({
+            res.status(401).send(JSON.stringify({
               'message': `Wrong Password For Username : ${username}`,
-            });
+            }));
           }
         });
       } else {
-        res.status(200).json({
+        res.status(200).send(JSON.stringify({
           'message': `Can't authorization : ${username}`,
           'hint': 'please try to login and authorized again',
-        });
+        }));
       }
     });
   } catch (err) {
@@ -147,9 +160,13 @@ exports.editposts = async (req, res, next) => {
 exports.deleteposts = async (req, res) => {
   // eslint-disable-next-line no-unused-vars
   try {
+    let username = req.body.username;
+    let password = req.body.password;
     const sess = req.session;
-    const username = sess.username;
-    const password = sess.password;
+    if (req.session) {
+      username = sess.username;
+      password = sess.password;
+    };
     auth.findOne({username: username}, function(err, user) {
       if (err) throw err;
       if (user) {
@@ -162,21 +179,21 @@ exports.deleteposts = async (req, res) => {
             }, function(err, user) {
               if (err) console.log(err);
               console.log('Successful deletion');
-              res.status(200).json({
+              res.status(200).send(JSON.stringify({
                 'message': `Complete delete post id : ${req.params.id}`,
-              });
+              }));
             });
           } else {
-            res.status(401).json({
+            res.status(401).send(JSON.stringify({
               'message': `Wrong Password For Username : ${username}`,
-            });
+            }));
           }
         });
       } else {
-        res.status(200).json({
+        res.status(200).send(JSON.stringify({
           'message': `Can't authorization : ${username}`,
           'hint': 'please try to login and authorized again',
-        });
+        }));
       }
     });
   } catch (err) {

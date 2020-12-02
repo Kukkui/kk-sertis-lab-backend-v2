@@ -17,6 +17,7 @@
     "express": "^4.17.1",
     "express-session": "^1.17.1",
     "generate-password": "^1.5.1",
+    "generate-unit-test": "^0.1.2",
     "jsonwebtoken": "^8.5.1",
     "mocha": "^8.2.1",
     "mockgoose": "^8.0.4",
@@ -41,8 +42,15 @@
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.2.1",
+    "karma": "^5.2.3",
+    "karma-chrome-launcher": "^3.1.0",
+    "karma-firefox-launcher": "^2.1.0",
+    "karma-jasmine": "^4.0.1",
+    "karma-phantomjs-launcher": "^1.0.4",
+    "karma-qunit": "^4.1.1",
     "mochawesome": "^2.3.1",
     "nyc": "^11.1.0",
+    "qunitjs": "^2.4.1",
     "supertest": "^6.0.1"
   }
 }
