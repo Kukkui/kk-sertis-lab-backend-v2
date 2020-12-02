@@ -1,132 +1,202 @@
-/* eslint-disable camelcase */
-/* eslint-disable max-len */
-/* eslint-disable no-unused-vars */
 'use strict';
-const assert = require('chai').assert;
-const proxyquire = require('proxyquire').noCallThru();
-const sinon = require('sinon');
-const {deleteOne} = require('../src/models/auth.model');
-describe('userController: BLOGPOST tests', () => {
-  let authMock; let accountsMock;
-  let comparePasswordStub;
-  let userController;
-  let user; let req; let res; let next; let post; let jsonStub;
-  let initUserController;
-  let result;
-
-  beforeEach(() => {
-    post = 'res.send.done';
-    authMock = {
-      findOne: sinon.stub(),
+const auth = require('../models/auth.model');
+const accounts = require('../models/user.model');
+// view my posts via mongoose model
+exports.myposts = async (req, res, next) => {
+  try {
+    let username = req.body.username;
+    let password = req.body.password;
+    const sess = req.session;
+    if (req.session) {
+      username = sess.username;
+      password = sess.password;
     };
-    jsonStub = {message: 'json_test'},
-    accountsMock = {
-      create: sinon.stub(),
-      find: sinon.stub(),
-      findOneAndUpdate: sinon.stub(),
-      deleteOne: sinon.stub(),
-    };
-    user = {
-      comparePassword: sinon.stub(),
-    };
-    req = {
-      body: {},
-    };
-    res = {
-      send: sinon.stub().returns(post),
-      status: sinon.stub(),
-      json: sinon.stub().returns(jsonStub),
-    };
-    initUserController = () => {
-      userController = proxyquire('../src/controllers/userController', {
-        '../models/auth.model': authMock,
-        '../models/user.model': accountsMock,
-      });
-    };
-    initUserController();
-  });
-  afterEach(() => userController = {});
-
-  describe('myposts()', () => {
-    it('should call myposts() if the account is Authorized', () => {
-      req.body={
-        username: 'test',
-        password: 'test',
-      };
-      authMock.findOne.yields(null, user);
-      user.comparePassword(null, true);
-      accountsMock.find.yields(null, post);
-      userController.myposts(req, res, next);
-      assert.deepEqual(authMock.findOne.getCall(0).args[0], {username: 'test'});
+    // check for authenticated
+    auth.findOne({username: username}, function(err, user) {
+      if (err) throw err;
+      if (user) {
+        // compare password from session username and password
+        user.comparePassword(password, function(err, isMatch) {
+          if (err) throw err;
+          // username and password was found(authenticted isMatch)
+          if (isMatch) {
+            //
+            accounts.find({username: username}, function(err, posts) {
+              if (err) return next(err);
+              console.log(posts);
+              res.send(posts);
+            });
+          } else {
+            console.log('Password incorrect : '+password, isMatch);
+            res.status(401).send(JSON.stringify({
+              'message': `Wrong Password For Username : ${username}`,
+            }));
+          }
+        });
+      } else {
+        res.status(200).send(JSON.stringify({
+          'message': `Can't authorization : ${username}`,
+          'hint': 'please try to login and authorized again',
+        }));
+      }
     });
-  });
-
-  describe('addpost()', () => {
-    it('should call addposts() if the account is Authorized', () => {
-      req.body={
-        username: 'test2',
-        password: 'test2',
-      };
-      userController.addposts(req, res, next);
-      authMock.findOne.yields(null, user);
-      user.comparePassword(null, true);
-      accountsMock.create.yields(null, result);
-      assert.deepEqual(authMock.findOne.getCall(0).args[0], {username: 'test2'});
-      assert.deepEqual(res.send(result), 'res.send.done');
+  } catch (err) {
+    throw err;
+  };
+};
+// add posts via mongoose model
+exports.addposts = async (req, res, next) => {
+  try {
+    let username = req.body.username;
+    let password = req.body.password;
+    const sess = req.session;
+    if (req.session) {
+      username = sess.username;
+      password = sess.password;
+    };
+    auth.findOne({username: username}, function(err, user) {
+      if (err) throw err;
+      if (user) {
+        user.comparePassword(password, function(err, isMatch) {
+          if (err) throw err;
+          if (isMatch) {
+            const postobj = {
+              'username': req.body.username,
+              'content': req.body.content,
+              'cardName': req.body.cardName,
+              'cardStatus': req.body.cardStatus,
+              'cardContent': req.body.cardContent,
+              'cardCategory': req.body.cardCategory,
+            };
+            accounts.create(postobj, function(err, result) {
+              if (err) return next(err);
+              console.log(result);
+              res.send(result);
+            });
+          } else {
+            console.log('Password incorrect : '+password, isMatch);
+            res.status(401).send(JSON.stringify({
+              'message': `Wrong Password For Username : ${username}`,
+            }));
+          }
+        });
+      } else {
+        res.status(200).send(JSON.stringify({
+          'message': `Can't authorization : ${username}`,
+          'hint': 'please try to login and authorized again',
+        }));
+      }
     });
-  });
-
-  describe('allpost()', () => {
-    it('should call allposts() if the account is Authorized', () => {
-      userController.allposts(req, res, next);
-      accountsMock.find.yields(null, result);
-      assert.deepEqual(res.send(result), 'res.send.done');
+  } catch (err) {
+    throw err;
+  };
+};
+// list all posts via mongoose model
+exports.allposts = async (req, res, next) => {
+  try {
+    accounts.find({}, function(err, result) {
+      if (err) return next(err);
+      console.log(result);
+      res.send(result);
     });
-  });
+  } catch (err) {
+    throw err;
+  }
+};
+// edit posts via mongoose model req.params.id
+exports.editposts = async (req, res, next) => {
+  try {
+    let username = req.body.username;
+    let password = req.body.password;
+    const sess = req.session;
+    if (req.session) {
+      username = sess.username;
+      password = sess.password;
+    };
+    auth.findOne({username: username}, function(err, user) {
+      if (err) throw err;
+      if (user) {
+        user.comparePassword(password, function(err, isMatch) {
+          if (err) throw err;
+          if (isMatch) {
+            const obj = {
+              'username': req.body.username,
+              'content': req.body.content,
+              'cardName': req.body.cardName,
+              'cardStatus': req.body.cardStatus,
+              'cardContent': req.body.cardContent,
+              'cardCategory': req.body.cardCategory,
+            };
+            accounts.findOneAndUpdate({
+              _id: req.params.id,
+              username: username,
+            }, obj, function(err, user) {
+              if (err) console.log(err);
+              console.log('Successful edit');
 
-  describe('editposts()', () => {
-    it('should call editposts() if the account is Authorized', () => {
-      req.body={
-        username: 'test3',
-        password: 'test3',
-        content: 'req.body.content',
-        cardName: 'req.body.cardName',
-        cardStatus: 'req.body.cardStatus',
-        cardContent: 'req.body.cardContent',
-        cardCategory: 'req.body.cardCategory',
-      };
-      userController.editposts(req, res, next);
-      authMock.findOne.yields(null, user);
-      user.comparePassword(null, true);
-      accountsMock.findOneAndUpdate.yields(null, result);
-      assert.deepEqual(authMock.findOne.getCall(0).args[0], {username: 'test3'});
-
-      // How to stub .JSON for...
-      // res.status(200).json({
-      //   'message': `Complete edit post id : ${req.params.id}`,
-      // });
-      assert.deepEqual(res.send(result), 'res.send.done');
+              res.status(200).send(JSON.stringify({
+                'message': `Complete edit post id : ${req.params.id}`,
+              }));
+            });
+          } else {
+            console.log('Password incorrect : '+password, isMatch);
+            res.status(401).send(JSON.stringify({
+              'message': `Wrong Password For Username : ${username}`,
+            }));
+          }
+        });
+      } else {
+        res.status(200).send(JSON.stringify({
+          'message': `Can't authorization : ${username}`,
+          'hint': 'please try to login and authorized again',
+        }));
+      }
     });
-  });
-
-  describe('deleteposts()', () => {
-    it('should call deleteposts() if the account is Authorized', () => {
-      req.body={
-        username: 'test4',
-        password: 'test4',
-      };
-      req.params = {
-        id: 1,
-      };
-      userController.deleteposts(req, res);
-      authMock.findOne.yields(null, user);
-      user.comparePassword(null, true);
-      accountsMock.deleteOne(null, user);
-      // How to stub .JSON for...
-      // res.status(200).json({
-      //   'message': `Complete delete post id : ${req.params.id}`,
-      // });
-      assert.deepEqual(res.send(result), 'res.send.done');
+  } catch (err) {
+    throw err;
+  };
+};
+// delete post via mongoose model req.params.id
+exports.deleteposts = async (req, res) => {
+  // eslint-disable-next-line no-unused-vars
+  try {
+    let username = req.body.username;
+    let password = req.body.password;
+    const sess = req.session;
+    if (req.session) {
+      username = sess.username;
+      password = sess.password;
+    };
+    auth.findOne({username: username}, function(err, user) {
+      if (err) throw err;
+      if (user) {
+        user.comparePassword(password, function(err, isMatch) {
+          if (err) throw err;
+          if (isMatch) {
+            accounts.deleteOne({
+              _id: req.params.id,
+              username: username,
+            }, function(err, user) {
+              if (err) console.log(err);
+              console.log('Successful deletion');
+              res.status(200).send(JSON.stringify({
+                'message': `Complete delete post id : ${req.params.id}`,
+              }));
+            });
+          } else {
+            res.status(401).send(JSON.stringify({
+              'message': `Wrong Password For Username : ${username}`,
+            }));
+          }
+        });
+      } else {
+        res.status(200).send(JSON.stringify({
+          'message': `Can't authorization : ${username}`,
+          'hint': 'please try to login and authorized again',
+        }));
+      }
     });
-  });
-});
+  } catch (err) {
+    throw err;
+  };
+};
