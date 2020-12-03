@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 'use strict';
 const express = require('express');
-const routes = express.Router;
+const routes = require('./routes');
 const bodyParser = require('body-parser');
 const dbConfig = require('./configs/development.config.js');
 const mongoose = require('mongoose');
