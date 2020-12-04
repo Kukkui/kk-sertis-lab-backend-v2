@@ -26,4 +26,4 @@ routes.post('/posts/new', userController.addposts);
 routes.get('/posts/all', userController.allposts);
 routes.put('/posts/edit/:id', userController.editposts);
 routes.delete('/posts/delete/:id', userController.deleteposts);
-module.exports = {routes};
+module.exports = routes;
