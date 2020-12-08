@@ -7,17 +7,28 @@ const proxyquire = require('proxyquire').noCallThru();
 const sinon = require('sinon');
 const {deleteOne} = require('../src/models/auth.model');
 describe('userController: BLOGPOST tests', () => {
-  let authMock; let accountsMock;
+  let authMock; let accountsMock; let postioMock;
   let comparePasswordStub;
   let userController;
   let user; let req; let res; let next; let post; let jsonStub;
   let initUserController;
   let result;
+  let showResult;
 
   beforeEach(() => {
     post = 'res.send.done';
+    showResult = {message: 'hiResult'};
     authMock = {
       findOne: sinon.stub(),
+    };
+    postioMock = {
+      sessionx: sinon.stub(),
+      usernameCheck: sinon.stub().returns(true),
+      viewModeResult: sinon.stub(),
+      editModeResult: sinon.stub(),
+      addModeResult: sinon.stub(),
+      deleteModeResult: sinon.stub(),
+      finalResultFromMode: sinon.stub().returns(showResult),
     };
     jsonStub = {message: 'json_test'},
     accountsMock = {
@@ -37,10 +48,12 @@ describe('userController: BLOGPOST tests', () => {
       status: sinon.stub(),
       json: sinon.stub().returns(jsonStub),
     };
+    next = {};
     initUserController = () => {
       userController = proxyquire('../src/controllers/userController', {
         '../models/auth.model': authMock,
         '../models/user.model': accountsMock,
+        '../models/postio.model': postioMock,
       });
     };
     initUserController();
@@ -48,16 +61,24 @@ describe('userController: BLOGPOST tests', () => {
   afterEach(() => userController = {});
 
   describe('myposts()', () => {
-    it('should call myposts() if the account is Authorized', () => {
+    it('should call myposts() if the account is Authorized', async () => {
+      // let result, error,usernamepassword,user,isMatch;
       req.body={
         username: 'test',
         password: 'test',
       };
-      authMock.findOne.yields(null, user);
-      user.comparePassword(null, true);
-      accountsMock.find.yields(null, post);
       userController.myposts(req, res, next);
-      assert.deepEqual(authMock.findOne.getCall(0).args[0], {username: 'test'});
+      const one = postioMock.sessionx.yields(req, res, next);
+      const username = one.args[0][0].body.username;
+      const password = one.args[0][0].body.password;
+      const user = await authMock.findOne.returns({
+        username: 'test', password: 'test',
+      });
+      console.log(user.args[0]);
+      const two = await authMock.findOne.yields(user);
+      postioMock.usernameCheck.yields(true, req, res, next);
+      const testResult = postioMock.finalResultFromMode.yields(true, 'view', req, res, next);
+      assert.equal(testResult, showResult);
     });
   });
 
@@ -73,6 +94,15 @@ describe('userController: BLOGPOST tests', () => {
       accountsMock.create.yields(null, result);
       assert.deepEqual(authMock.findOne.getCall(0).args[0], {username: 'test2'});
       assert.deepEqual(res.send(result), 'res.send.done');
+    });
+
+    it('Test', async () => {
+      const mode = 'add';
+      postioMock.sessionx.returns(['user', 'pass']);
+      await authMock.findOne.returns({user: 'user'});
+
+      await userController.addposts(req, res, next);
+      assert.deepEqual(postioMock.sessionx.args[0], req);
     });
   });
 

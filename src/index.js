@@ -26,8 +26,4 @@ mongoose.connect(dbConfig.url, {
 // define a simple route
 app.use('/', routes);
 const port = process.env.PORT || 5000;
-const server = app.listen(port, () => console.log(`Listening on port : ${port}...`) );
-module.exports = {
-  app: app,
-  server: server,
-};
+module.exports = app.listen(port, () => console.log(`Listening on port : ${port}...`) );

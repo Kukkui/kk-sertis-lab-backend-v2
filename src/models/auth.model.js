@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable no-invalid-this */
 'use strict';
 const mongoose = require('mongoose');
@@ -19,12 +20,13 @@ accounts.pre('save', async function(next) {
   this.passwordConfirm = undefined;
   next();
 });
-accounts.methods.comparePassword = function(candidatePassword, cb) {
-  bcrypt.compare(candidatePassword, this.password, function(err, isMatch) {
-    if (err) return cb(err);
-    cb(null, isMatch);
+accounts.methods.comparePassword = async function(candidatePassword) {
+  return new Promise(async (resolve, reject) => {
+    const isMatch = await bcrypt.compare(candidatePassword, this.password);
+    resolve(isMatch);
   });
 };
+
 // This is Instance Method that available on all documents
 // in a certain collection
 accounts.methods.correctPassword = async function(
