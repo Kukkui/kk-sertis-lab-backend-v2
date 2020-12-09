@@ -40,3 +40,4 @@
 <b>DELTE localhost:5000/posts/delete/[:id] <= {} </b><br/><br/>
 <hr/><br/>
 
+# kk-sertis-lab-backend-v2
