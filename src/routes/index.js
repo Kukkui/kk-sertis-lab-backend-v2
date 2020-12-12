@@ -6,7 +6,7 @@
 const express = require('express');
 const routes = express.Router();
 const session = require('express-session');
-const authController = require('./../controllers/authController');
+const authController = require('../controllers/authController');
 const userController = require('./../controllers/userController');
 const {RuleTester} = require('eslint');
 

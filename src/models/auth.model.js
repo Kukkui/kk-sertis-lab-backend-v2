@@ -21,14 +21,11 @@ accounts.pre('save', async function(next) {
   next();
 });
 accounts.methods.comparePassword = async function(candidatePassword) {
-  return new Promise(async (resolve, reject) => {
-    const isMatch = await bcrypt.compare(candidatePassword, this.password);
-    resolve(isMatch);
-  });
-};
+  return await bcrypt.compare(candidatePassword, this.password);
 
-// This is Instance Method that available on all documents
+  // This is Instance Method that available on all documents
 // in a certain collection
+};
 accounts.methods.correctPassword = async function(
     typedPassword,
     originalPassword,

@@ -3,63 +3,26 @@
 /* eslint-disable max-len */
 'use strict';
 const auth = require('../models/auth.model');
+const authfn = require('../helper/auth.helper');
 const generator = require('generate-password');
 // Promise lab playground
-exports.auth = async (req, res, next) =>{
+exports.auth = async (req, res, err) => {
+  const sess = req.session;
+  const uu = req.body.username;
+  const pp = req.body.password;
   try {
-    const {username, password} = req.body;
-    const user = await auth.findOne({username: username});
-    if (user) {
-      return (await checkpassword(user, req, res, next));
-    } else {
-      createNewAccount(req, res);
-    }
+    const founduser = await auth.findOne({username: uu});
+    console.log(founduser);
+    if (founduser) {
+      const a = await authfn._checkpassword(founduser, uu, pp);
+      const b = await authfn._setsession(sess, uu, pp);
+      console.log('next is aaaaaaaaaaaaaaaaaaaaaa');
+      console.log(a);
+      console.log(b);
+
+      return res.send(a);
+    }authfn._createNewAccount(uu);
   } catch (err) {
-    throw err;
-  };
-};
-
-const checkpassword = async function(user, req, res, next) {
-  try {
-    user.comparePassword(req.body.password).then((isMatch)=>{
-      showresponse(isMatch, req, res, next);
-    }).catch((e)=>{
-      console.log(e);
-    });
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-
-const createNewAccount = async function(req, res) {
-  try {
-    const genPassword = generator.generate({length: 10, numbers: true});
-    const username = req.body.username;
-    const result = auth.create({username: username, password: genPassword});
-    console.log(result);
-    res.status(200).json({
-      'message': `Created new account : ${req.body.username}`,
-      'password': genPassword,
-    });
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-const showresponse = async function(isMatch, req, res, next) {
-  try {
-    if (isMatch) {
-      const sess = req.session;
-      sess.username = req.body.username;
-      sess.password = req.body.password;
-      console.log('Password correct :' + req.body.password, isMatch);
-      res.status(200).json({'message': `Correct Password For Username : ${req.body.username}`});
-    } else {
-      console.log('Password incorrect : '+req.body.password, isMatch);
-      res.status(401).json({'message': `Wrong Password For Username : ${req.body.username}`});
-    }
-  } catch (error) {
-    console.log(error);
+    return res.send('JOB_ERROR');
   }
 };

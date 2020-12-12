@@ -5,18 +5,15 @@
 const {deleteModel} = require('mongoose');
 const auth = require('../models/auth.model');
 const accounts = require('../models/user.model');
-const postio = require('../models/postio.model');
+const userfn = require('../helper/user.helper');
 // Async/Await lab playground
 exports.myposts = async (req, res, next) => {
   try {
     const mode = 'view';
-    const UsernamePassword = postio.sessionx(req, res, next);
-    const [username, password] = UsernamePassword;
+    const [username, password] = await userfn.sessionx();
     const user = await auth.findOne({username: username});
-    console.log(user);
-    const isMatched = await postio.usernameCheck(user, req, res, next);
-    console.log(isMatched);
-    const showResult = await postio.finalResultFromMode(isMatched, mode, req, res, next);
+    const isMatched = await userfn.usernameCheck(user);
+    const showResult = await userfn.finalResultFromMode(isMatched, mode);
     return res.send(showResult);
   } catch (err) {
     throw err;
@@ -26,11 +23,10 @@ exports.myposts = async (req, res, next) => {
 exports.addposts = async (req, res, next) => {
   try {
     const mode ='add';
-    const UsernamePassword = postio.sessionx(req, res, next);
-    const [username, password] = UsernamePassword;
+    const [username, password] = userfn.sessionx(req, res, next);
     const user = await auth.findOne({username: username});
-    const isMatched = await postio.usernameCheck(user, req, res, next);
-    const showResult = await postio.finalResultFromMode(isMatched, mode, req, res, next);
+    const isMatched = await userfn.usernameCheck(user, req, res, next);
+    const showResult = await userfn.finalResultFromMode(isMatched, mode, req, res, next);
     return res.send(showResult);
   } catch (err) {
     throw err;
@@ -49,11 +45,11 @@ exports.allposts = async (req, res, next) => {
 exports.editposts = async (req, res, next) => {
   try {
     const mode = 'edit';
-    const UsernamePassword = postio.sessionx(req, res, next);
+    const UsernamePassword = userfn.sessionx(req, res, next);
     const [username, password] = UsernamePassword;
     const user = await auth.findOne({username: username});
-    const isMatched = await postio.usernameCheck(user, req, res, next);
-    const showResult = await postio.finalResultFromMode(isMatched, mode, req, res, next);
+    const isMatched = await userfn.usernameCheck(user, req, res, next);
+    const showResult = await userfn.finalResultFromMode(isMatched, mode, req, res, next);
     return res.send(showResult);
   } catch (err) {
     throw err;
@@ -63,11 +59,10 @@ exports.editposts = async (req, res, next) => {
 exports.deleteposts = async (req, res, next) => {
   try {
     const mode = 'delete';
-    const UsernamePassword = postio.sessionx(req, res, next);
-    const [username, password] = UsernamePassword;
+    const [username, password] = userfn.sessionx();
     const user = await auth.findOne({username: username});
-    const isMatched = await postio.usernameCheck(user, req, res, next);
-    const showResult = await postio.finalResultFromMode(isMatched, mode, req, res, next);
+    const isMatched = await userfn.usernameCheck(user);
+    const showResult = await userfn.finalResultFromMode(isMatched, mode);
     return res.send(showResult);
   } catch (err) {
     throw err;

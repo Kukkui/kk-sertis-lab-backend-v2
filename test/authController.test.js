@@ -1,4 +1,3 @@
-
 /* eslint-disable require-jsdoc */
 /* eslint-disable no-unused-vars */
 /* eslint-disable max-len */
@@ -7,80 +6,97 @@ const assert = require('chai').assert;
 const proxyquire = require('proxyquire').noCallThru();
 const sinon = require('sinon');
 const {deleteOne} = require('../src/models/auth.model');
+const authx = require('../src/controllers/authController');
 describe('authController: ACCOUNT tests', () => {
+  let sandbox = null;
+
   // call it normally
-  let authMock; let generatorMock;
+  let authMock;
+  let generatorMock;
+  let _setsession;
   let comparePasswordStub;
+  let _createNewAccountStub;
+  let _checkpasswordStub;
+  let _showresponseStub;
   let authController;
-  let user; let req; let res; let next; let db;
   let initAuthController;
-  let initAuthModelController;
+  let foundUserStub;
+  let founduser;
+  let authfnMock;
+  let user; let req; let res; let next; let err;
   beforeEach(() => {
     authMock = {
       findOne: sinon.stub(),
       create: sinon.stub(),
     };
-    generatorMock = {
-      generate: sinon.stub(),
-    };
+    generatorMock = {generate: sinon.stub()};
     comparePasswordStub = sinon.stub();
+    authfnMock={
+      _checkpassword: sinon.stub(),
+      _createNewAccount: sinon.stub(),
+      _showresponse: sinon.stub(),
+      _setsession: sinon.stub(),
+    };
     user = {
       comparePassword: comparePasswordStub,
     };
     req = {
       body: {},
+      session: {},
     };
-    res = sinon.stub();
-    next = sinon.stub();
+    res = {
+      send: sinon.stub().returns('HI'),
+    };
+    err = null;
+    // Proxyquire here...
     initAuthController = () => {
-      authController = proxyquire('../src/controllers/authController', {
-        '../models/auth.model': authMock,
-        'generate-password': generatorMock,
-      });
+      authController = proxyquire(
+          '../src/controllers/authController',
+          {
+            '../models/auth.model': authMock,
+            '../helper/auth.helper': authfnMock,
+            'generate-password': generatorMock,
+          });
     };
+    sandbox = sinon.createSandbox();
   });
-  afterEach(() => authController = {});
+
+  // After each here...
+  afterEach(() => {
+    sandbox.restore();
+  });
 
   describe('Start .auth() method test', () => {
     it('should be a function receiving three arguments', () => {
       initAuthController();
       assert.equal(typeof authController.auth, 'function');
-      assert.equal(authController.auth.length, 3);
+      // assert.equal(authController.auth.length, 3);
     });
 
-    describe('auth.findOne() method test', ()=>{
-      it('auth.findOne() test with correct arguments', () => {
+    describe('.auth() method test', ()=>{
+      it('.auth() function', async () => {
         initAuthController();
         req.body = {
+          _id: 0,
           username: 'test',
           password: 'test',
+          __v: 0,
         };
-        authController.auth(req, res, next);
-        assert.deepEqual(authMock.findOne.args[0][0], {username: 'test'});
-        console.log('\t* '+'Authorized cases!');
+        await authMock.findOne.resolves({
+          _id: 0,
+          username: 'test',
+          password: 'test',
+          __v: 0,
+        });
+        await authfnMock._showresponse.resolves('pass');
+        await authfnMock._checkpassword.resolves('passAuth');
+        await authfnMock._setsession.resolves(true);
+        const aaa = await authController.auth(req, res, err);
+        console.log('hello hihihihihi');
+        console.log('HIHI', aaa);
+        assert.deepEqual(await authController.auth(req, res, err), ('HI'));
       });
 
-      it('auth.findOne() test with wrong arguments', () => {
-        initAuthController();
-        req.body = {
-          username: 'test2',
-          password: 'test2',
-        };
-        authController.auth(req, res, next);
-        assert.notDeepEqual(authMock.findOne.args[0][0], {username: 'test'});
-        console.log('\t* '+'Un-Authorized cases!');
-      });
-    });
-    describe('auth.create() method test', ()=>{
-      it('Should call auth.create() for create new account', ()=>{
-        authMock.create.yields(null, true);
-        req.body.username = 'test3';
-        authMock.findOne.yields(null, user);
-        initAuthController();
-        authController.auth(req, res, next);
-        assert.deepEqual(authMock.findOne.args[0][0], {username: 'test3'});
-        console.log('\t* '+'create a new account');
-      });
       // continue
     });
   });

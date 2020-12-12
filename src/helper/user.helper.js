@@ -2,13 +2,11 @@
 
 /* eslint-disable no-unused-vars */
 'use strict';
-const {deleteModel} = require('mongoose');
-const auth = require('../models/auth.model');
 const accounts = require('../models/user.model');
 // Async/Await lab playground
 // Sub functions listed here...
 
-const sessionx = function(req, res, next) {
+const sessionx = async function() {
   let username = req.body.username;
   let password = req.body.password;
   const sess = req.session;
@@ -20,49 +18,28 @@ const sessionx = function(req, res, next) {
 };
 
 
-const usernameCheck = async function(user, req, res, next) {
+const usernameCheck = async function(user) {
   try {
-    const UsernamePassword = sessionx(req, res, next);
-    const [username, password] = UsernamePassword;
-    if (user) {
-      const isMatch = await user.comparePassword(password);
-      return isMatch;
-    }
-    return false;
+    const [username, password] = sessionx();
+    if (await user.comparePassword(password)) {
+      return true;
+    } return false;
   } catch (error) {
     throw error;
   }
 };
 
 
-const viewModeResult = async function(req, res, next) {
+const viewModeResult = async function() {
   try {
-    const UsernamePassword = sessionx(req, res, next);
-    const [username, password] = UsernamePassword;
-    return await accounts.find({username: username});
+    const [username, password] = sessionx();
+    return await accounts.find({username});
   } catch (error) {
     throw error;
   }
 };
-const editModeResult = async function(req, res, next) {
+const editModeResult = async function() {
   try {
-    const UsernamePassword = sessionx(req, res, next);
-    const [username, password] = UsernamePassword;
-    const obj = {
-      username: req.body.username,
-      content: req.body.content,
-      cardName: req.body.cardName,
-      cardStatus: req.body.cardStatus,
-      cardContent: req.body.cardContent,
-      cardCategory: req.body.cardCategory,
-    };
-    const result = await accounts.findOneAndUpdate(
-        {
-          _id: req.params.id,
-          username: username,
-        },
-        obj,
-    );
     console.log('Successful edit');
     return ({message: `Complete edit post id : ${req.params.id}`});
   } catch (error) {
@@ -71,17 +48,7 @@ const editModeResult = async function(req, res, next) {
 };
 const addModeResult = async function(req, res, next) {
   try {
-    const UsernamePassword = sessionx(req, res, next);
-    const [username, password] = UsernamePassword;
-    const postobj = {
-      username: req.body.username,
-      content: req.body.content,
-      cardName: req.body.cardName,
-      cardStatus: req.body.cardStatus,
-      cardContent: req.body.cardContent,
-      cardCategory: req.body.cardCategory,
-    };
-    const result = await accounts.create(postobj);
+    const result = await accounts.create(req.body);
     return result;
   } catch (error) {
     throw error;
@@ -89,15 +56,16 @@ const addModeResult = async function(req, res, next) {
 };
 const deleteModeResult = async function(req, res, next) {
   try {
-    const UsernamePassword = sessionx(req, res, next);
-    const [username, password] = UsernamePassword;
+    const [username, password] = sessionx(req, res, next);
     accounts.deleteOne(
         {
           _id: req.params.id,
           username: username,
         },
-        function(err, user) {
-          if (err) console.log(err);
+        (err) => {
+          if (err) {
+            console.log(err);
+          }
         },
     );
     console.log('Succesful delete');
@@ -106,10 +74,10 @@ const deleteModeResult = async function(req, res, next) {
     throw error;
   }
 };
-const finalResultFromMode = async function(isMatch, mode, req, res, next) {
+const finalResultFromMode = async function(isMatch, mode) {
   try {
     const UsernamePassword = sessionx(req, res, next);
-    const [username, password] = UsernamePassword;
+    const [, password] = UsernamePassword;
     if (isMatch && mode=='view') {
       return viewModeResult(req, res, next);
     } else if (isMatch && mode=='add') {
